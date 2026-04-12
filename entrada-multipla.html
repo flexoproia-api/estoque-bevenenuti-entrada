@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Entrada Múltipla — Estoque Benevenuti</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #f4f4f2;
+    --surface: #ffffff;
+    --border: #e2e2de;
+    --text: #1a1a18;
+    --muted: #888884;
+    --accent: #e8521a;
+    --accent-light: #fdf0eb;
+    --success: #1a7a4a;
+    --success-light: #eaf5f0;
+    --error: #c0392b;
+    --error-light: #fdf0ef;
+    --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.06);
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 0;
+  }
+
+  /* HEADER */
+  .header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 24px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .logo {
+    font-weight: 600;
+    font-size: 15px;
+    letter-spacing: -0.3px;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .logo-badge {
+    background: var(--text);
+    color: white;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 6px;
+    border-radius: 4px;
+    letter-spacing: 0.5px;
+  }
+
+  .header-sep { color: var(--border); font-size: 18px; }
+
+  .page-title {
+    font-size: 14px;
+    color: var(--muted);
+    font-weight: 500;
+  }
+
+  /* MAIN */
+  .main {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 32px 24px 80px;
+  }
+
+  .section-title {
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: -0.5px;
+    margin-bottom: 6px;
+  }
+
+  .section-sub {
+    font-size: 14px;
+    color: var(--muted);
+    margin-bottom: 28px;
+  }
+
+  /* CARD */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 16px;
+    box-shadow: var(--shadow);
+  }
+
+  .card-label {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+
+  /* FIELDS */
+  .field { margin-bottom: 20px; }
+  .field:last-child { margin-bottom: 0; }
+
+  label {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+
+  .required { color: var(--accent); margin-left: 2px; }
+
+  select, input[type="text"], input[type="password"] {
+    width: 100%;
+    padding: 11px 14px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: var(--text);
+    background: var(--bg);
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+
+  select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23888' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 36px;
+  }
+
+  select:focus, input:focus {
+    border-color: var(--text);
+    box-shadow: 0 0 0 3px rgba(26,26,24,0.08);
+    background: white;
+  }
+
+  /* BARCODE AREA */
+  .barcode-area {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    margin-bottom: 16px;
+  }
+
+  .barcode-header {
+    padding: 16px 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .barcode-header-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .scan-indicator {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--success);
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.8); }
+  }
+
+  .scan-indicator.waiting { background: var(--muted); animation: none; }
+
+  .barcode-title {
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  .counter-badge {
+    background: var(--text);
+    color: white;
+    font-size: 12px;
+    font-weight: 600;
+    font-family: 'DM Mono', monospace;
+    padding: 3px 10px;
+    border-radius: 20px;
+    min-width: 32px;
+    text-align: center;
+  }
+
+  .barcode-input-wrap {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .barcode-icon {
+    color: var(--muted);
+    flex-shrink: 0;
+  }
+
+  #barcodeInput {
+    border: none;
+    background: transparent;
+    font-family: 'DM Mono', monospace;
+    font-size: 16px;
+    font-weight: 500;
+    letter-spacing: 1px;
+    flex: 1;
+    padding: 0;
+    outline: none;
+    color: var(--text);
+  }
+
+  #barcodeInput::placeholder { color: var(--muted); font-weight: 400; letter-spacing: 0; }
+
+  #barcodeInput:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  /* LIST */
+  .entries-list {
+    max-height: 320px;
+    overflow-y: auto;
+  }
+
+  .entry-item {
+    padding: 12px 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 1px solid var(--border);
+    animation: slideIn 0.2s ease;
+  }
+
+  .entry-item:last-child { border-bottom: none; }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(-6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .entry-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    width: 20px;
+    flex-shrink: 0;
+    text-align: right;
+  }
+
+  .entry-code {
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    font-weight: 500;
+    flex: 1;
+    color: var(--text);
+  }
+
+  .entry-desc {
+    font-size: 12px;
+    color: var(--muted);
+    flex: 2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .entry-status {
+    width: 20px;
+    flex-shrink: 0;
+    text-align: center;
+  }
+
+  .status-ok { color: var(--success); }
+  .status-err { color: var(--error); }
+  .status-loading { color: var(--muted); }
+
+  .empty-state {
+    padding: 40px 24px;
+    text-align: center;
+    color: var(--muted);
+    font-size: 14px;
+  }
+
+  .empty-icon { font-size: 32px; margin-bottom: 8px; opacity: 0.4; }
+
+  /* TOAST */
+  .toast-wrap {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 999;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: center;
+    pointer-events: none;
+  }
+
+  .toast {
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    animation: toastIn 0.2s ease, toastOut 0.3s ease 2.7s forwards;
+    pointer-events: none;
+    white-space: nowrap;
+  }
+
+  .toast.success { background: var(--success); color: white; }
+  .toast.error { background: var(--error); color: white; }
+
+  @keyframes toastIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes toastOut { to { opacity: 0; transform: translateY(8px); } }
+
+  /* BUTTONS */
+  .btn-row {
+    display: flex;
+    gap: 10px;
+    margin-top: 4px;
+  }
+
+  .btn {
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .btn-primary {
+    background: var(--text);
+    color: white;
+    flex: 1;
+    justify-content: center;
+  }
+
+  .btn-primary:hover { background: #333; }
+  .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid var(--border);
+  }
+
+  .btn-ghost:hover { background: var(--bg); color: var(--text); }
+
+  .btn-danger {
+    background: var(--error-light);
+    color: var(--error);
+    border: 1px solid #f5c6c3;
+  }
+
+  .btn-danger:hover { background: #fde8e6; }
+
+  /* LOCK SCREEN */
+  #lockScreen {
+    position: fixed;
+    inset: 0;
+    background: var(--bg);
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+
+  .lock-card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 40px 32px;
+    width: 100%;
+    max-width: 360px;
+    box-shadow: var(--shadow);
+    text-align: center;
+  }
+
+  .lock-logo {
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -1px;
+    margin-bottom: 4px;
+  }
+
+  .lock-sub {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 32px;
+  }
+
+  .lock-card .field { text-align: left; }
+
+  /* SETUP SCREEN */
+  #setupScreen { display: none; }
+
+  /* SUMMARY */
+  .summary-bar {
+    background: var(--success-light);
+    border: 1px solid #b8e0cc;
+    border-radius: 10px;
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+    display: none;
+  }
+
+  .summary-bar.show { display: flex; }
+
+  .summary-text { font-size: 14px; font-weight: 500; color: var(--success); }
+
+  /* STEP INDICATOR */
+  .steps {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 24px;
+  }
+
+  .step {
+    flex: 1;
+    height: 3px;
+    border-radius: 2px;
+    background: var(--border);
+    transition: background 0.3s;
+  }
+
+  .step.active { background: var(--accent); }
+  .step.done { background: var(--success); }
+</style>
+</head>
+<body>
+
+<!-- LOCK SCREEN -->
+<div id="lockScreen">
+  <div class="lock-card">
+    <div class="lock-logo">BB</div>
+    <div style="font-weight:600;font-size:16px;margin-bottom:4px;">Estoque Benevenuti</div>
+    <div class="lock-sub">Entrada Múltipla de Materiais</div>
+
+    <div class="field">
+      <label for="loginUser">Seu nome<span class="required">*</span></label>
+      <input type="text" id="loginUser" placeholder="Ex: João Silva" autocomplete="off">
+    </div>
+    <div class="field">
+      <label for="loginPass">Senha<span class="required">*</span></label>
+      <input type="password" id="loginPass" placeholder="••••••••">
+    </div>
+
+    <div id="loginError" style="color:var(--error);font-size:13px;margin-bottom:14px;display:none;"></div>
+
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="doLogin()" style="margin-top:4px">Entrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="logo">
+    <span class="logo-badge">BB</span>
+    Estoque Benevenuti
+  </div>
+  <span class="header-sep">/</span>
+  <span class="page-title">Entrada Múltipla</span>
+  <div style="margin-left:auto;display:flex;align-items:center;gap:10px;">
+    <span id="headerUser" style="font-size:13px;color:var(--muted);"></span>
+    <button class="btn btn-ghost" style="padding:6px 12px;font-size:13px;" onclick="doLogout()">Sair</button>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- SETUP SCREEN -->
+  <div id="setupScreen">
+    <div class="steps">
+      <div class="step active" id="step1"></div>
+      <div class="step" id="step2"></div>
+    </div>
+
+    <div class="section-title">Configurar entrada</div>
+    <div class="section-sub">Selecione a localização antes de começar a bipar.</div>
+
+    <div class="card">
+      <div class="field">
+        <label for="localSelect">Localização (Pallet)<span class="required">*</span></label>
+        <select id="localSelect">
+          <option value="">Carregando localizações...</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="startScanning()" id="btnStart" disabled>
+        Iniciar bipagem →
+      </button>
+    </div>
+  </div>
+
+  <!-- SCAN SCREEN -->
+  <div id="scanScreen" style="display:none;">
+    <div class="steps">
+      <div class="step done" id="step1b"></div>
+      <div class="step active" id="step2b"></div>
+    </div>
+
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+      <div class="section-title">Bipando materiais</div>
+      <button class="btn btn-ghost" style="padding:6px 12px;font-size:13px;" onclick="changeLocation()">← Trocar local</button>
+    </div>
+
+    <div class="section-sub">
+      Localização: <strong id="selectedLocLabel" style="color:var(--text)"></strong>
+      · Bipe os códigos de barras um a um
+    </div>
+
+    <div id="summaryBar" class="summary-bar">
+      <span>✓</span>
+      <span class="summary-text" id="summaryText"></span>
+    </div>
+
+    <div class="barcode-area">
+      <div class="barcode-header">
+        <div class="barcode-header-left">
+          <div class="scan-indicator" id="scanDot"></div>
+          <span class="barcode-title">Aguardando bipe...</span>
+        </div>
+        <span class="counter-badge" id="counterBadge">0</span>
+      </div>
+
+      <div class="barcode-input-wrap">
+        <svg class="barcode-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M3 5v14M7 5v14M11 5v14M15 5v8M19 5v8M3 17h8M15 17h6v-4h-6v4z"/>
+        </svg>
+        <input type="text" id="barcodeInput" placeholder="Bipe aqui..." autocomplete="off" autocorrect="off" spellcheck="false">
+      </div>
+
+      <div id="entriesList">
+        <div class="empty-state">
+          <div class="empty-icon">📦</div>
+          Nenhuma bobina registrada ainda
+        </div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-danger" onclick="clearAll()">Limpar tudo</button>
+      <button class="btn btn-primary" onclick="finishSession()" id="btnFinish" disabled>
+        Finalizar sessão
+      </button>
+    </div>
+  </div>
+
+</div>
+
+<!-- TOAST -->
+<div class="toast-wrap" id="toastWrap"></div>
+
+<script>
+// ─── CONFIG ───────────────────────────────────────────────
+const GLIDE_TOKEN  = "COLE_SEU_TOKEN_AQUI";
+const GLIDE_APP    = "FfbUFU97aWzsyCDvKZKV";
+const TABLE_MOV    = "native-table-6OvG8uWu6JdMCTX3tyg6";
+const TABLE_LOCAL  = ""; // cole o ID da tabela de Localizações
+const TABLE_MAT    = ""; // cole o ID da tabela de Materiais
+
+// IDs das colunas de Movimentos
+const COL = {
+  codigoBarras:    "aIlEP",
+  data:            "Q2fsH",
+  usuario:         "tqPkR",
+  entradaQtd:      "DfoDL",
+  localizacao:     "zeAYW",
+  chaveMatLocal:   "" // cole o column ID de Chave_MatLocal se tiver
+};
+
+const SENHA = "Alfagraf1234";
+
+// ─── STATE ────────────────────────────────────────────────
+let currentUser = null;
+let selectedLoc = null;
+let entries     = []; // { code, desc, status: 'loading'|'ok'|'error' }
+
+// ─── AUTH ─────────────────────────────────────────────────
+function doLogin() {
+  const user = document.getElementById('loginUser').value.trim();
+  const pass = document.getElementById('loginPass').value;
+  const err  = document.getElementById('loginError');
+
+  if (!user) { showErr(err, 'Informe seu nome.'); return; }
+  if (pass !== SENHA) { showErr(err, 'Senha incorreta.'); return; }
+
+  currentUser = user;
+  document.getElementById('lockScreen').style.display = 'none';
+  document.getElementById('headerUser').textContent = user;
+  showSetup();
+}
+
+function doLogout() {
+  currentUser = null;
+  entries = [];
+  selectedLoc = null;
+  document.getElementById('lockScreen').style.display = 'flex';
+  document.getElementById('loginPass').value = '';
+}
+
+function showErr(el, msg) {
+  el.textContent = msg;
+  el.style.display = 'block';
+  setTimeout(() => el.style.display = 'none', 3000);
+}
+
+// ─── GLIDE API ────────────────────────────────────────────
+async function glideQuery(tableId, columns) {
+  const res = await fetch("https://api.glideapp.io/api/function/queryTables", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + GLIDE_TOKEN
+    },
+    body: JSON.stringify({
+      appID: GLIDE_APP,
+      queries: [{ tableName: tableId, utc: true }]
+    })
+  });
+  const data = await res.json();
+  return data[0]?.rows || [];
+}
+
+async function glideAddRow(tableId, columnValues) {
+  const res = await fetch("https://api.glideapp.io/api/function/mutateTables", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + GLIDE_TOKEN
+    },
+    body: JSON.stringify({
+      appID: GLIDE_APP,
+      mutations: [{
+        kind: "add-row-to-table",
+        tableName: tableId,
+        columnValues
+      }]
+    })
+  });
+  return res.ok;
+}
+
+// ─── SETUP ────────────────────────────────────────────────
+async function showSetup() {
+  document.getElementById('setupScreen').style.display = 'block';
+  document.getElementById('scanScreen').style.display  = 'none';
+
+  const sel = document.getElementById('localSelect');
+  sel.innerHTML = '<option value="">Carregando...</option>';
+
+  try {
+    // Se TABLE_LOCAL estiver vazio, usa lista fixa de localizações como fallback
+    let locs = [];
+    if (TABLE_LOCAL) {
+      const rows = await glideQuery(TABLE_LOCAL);
+      locs = rows.map(r => r["Localização"] || r[Object.keys(r)[0]]).filter(Boolean).sort();
+    } else {
+      // Fallback: extrair localizações únicas da tabela de movimentos
+      const rows = await glideQuery(TABLE_MOV);
+      const set = new Set(rows.map(r => r[COL.localizacao]).filter(Boolean));
+      locs = [...set].sort();
+    }
+
+    sel.innerHTML = '<option value="">Selecione a localização...</option>';
+    locs.forEach(l => {
+      const o = document.createElement('option');
+      o.value = o.textContent = l;
+      sel.appendChild(o);
+    });
+
+    sel.addEventListener('change', () => {
+      document.getElementById('btnStart').disabled = !sel.value;
+    });
+
+  } catch(e) {
+    sel.innerHTML = '<option value="">Erro ao carregar — tente novamente</option>';
+    toast('Erro ao carregar localizações', 'error');
+  }
+}
+
+function startScanning() {
+  selectedLoc = document.getElementById('localSelect').value;
+  if (!selectedLoc) return;
+
+  document.getElementById('selectedLocLabel').textContent = selectedLoc;
+  document.getElementById('setupScreen').style.display = 'none';
+  document.getElementById('scanScreen').style.display  = 'block';
+
+  entries = [];
+  renderList();
+  focusInput();
+}
+
+function changeLocation() {
+  document.getElementById('setupScreen').style.display = 'block';
+  document.getElementById('scanScreen').style.display  = 'none';
+}
+
+// ─── SCANNING ─────────────────────────────────────────────
+function focusInput() {
+  const inp = document.getElementById('barcodeInput');
+  inp.disabled = false;
+  inp.value = '';
+  inp.focus();
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const inp = document.getElementById('barcodeInput');
+
+  inp.addEventListener('keydown', async (e) => {
+    if (e.key === 'Enter') {
+      const code = inp.value.trim();
+      inp.value = '';
+      if (!code) return;
+      await processBarcode(code);
+    }
+  });
+
+  // Re-focus se perder o foco durante scan
+  inp.addEventListener('blur', () => {
+    if (document.getElementById('scanScreen').style.display !== 'none') {
+      setTimeout(() => inp.focus(), 100);
+    }
+  });
+});
+
+async function processBarcode(code) {
+  const entry = { code, desc: '...', status: 'loading' };
+  entries.unshift(entry);
+  renderList();
+  updateCounter();
+
+  try {
+    const ok = await glideAddRow(TABLE_MOV, {
+      [COL.codigoBarras]: code,
+      [COL.localizacao]:  selectedLoc,
+      [COL.entradaQtd]:   1,
+      [COL.usuario]:      currentUser,
+      [COL.data]:         new Date().toISOString(),
+      ...(COL.chaveMatLocal ? { [COL.chaveMatLocal]: `${code}|${selectedLoc}` } : {})
+    });
+
+    entry.status = ok ? 'ok' : 'error';
+    entry.desc   = ok ? selectedLoc : 'Erro ao salvar';
+
+    if (ok) {
+      toast(`✓ ${code} registrado`, 'success');
+    } else {
+      toast(`Erro ao salvar ${code}`, 'error');
+    }
+
+  } catch(e) {
+    entry.status = 'error';
+    entry.desc   = 'Falha de conexão';
+    toast(`Falha ao registrar ${code}`, 'error');
+  }
+
+  renderList();
+  updateCounter();
+  updateSummary();
+  document.getElementById('btnFinish').disabled = entries.length === 0;
+}
+
+// ─── RENDER ───────────────────────────────────────────────
+function renderList() {
+  const el = document.getElementById('entriesList');
+
+  if (entries.length === 0) {
+    el.innerHTML = `<div class="empty-state"><div class="empty-icon">📦</div>Nenhuma bobina registrada ainda</div>`;
+    return;
+  }
+
+  el.innerHTML = entries.map((e, i) => `
+    <div class="entry-item">
+      <span class="entry-num">${entries.length - i}</span>
+      <span class="entry-code">${e.code}</span>
+      <span class="entry-desc">${e.desc}</span>
+      <span class="entry-status">
+        ${e.status === 'ok'      ? '<span class="status-ok">✓</span>'  : ''}
+        ${e.status === 'error'   ? '<span class="status-err">✗</span>' : ''}
+        ${e.status === 'loading' ? '<span class="status-loading">…</span>' : ''}
+      </span>
+    </div>
+  `).join('');
+}
+
+function updateCounter() {
+  document.getElementById('counterBadge').textContent = entries.length;
+}
+
+function updateSummary() {
+  const ok  = entries.filter(e => e.status === 'ok').length;
+  const bar = document.getElementById('summaryBar');
+  const txt = document.getElementById('summaryText');
+  if (ok > 0) {
+    bar.classList.add('show');
+    txt.textContent = `${ok} bobina${ok > 1 ? 's' : ''} registrada${ok > 1 ? 's' : ''} com sucesso`;
+  }
+}
+
+// ─── ACTIONS ──────────────────────────────────────────────
+function clearAll() {
+  if (!confirm(`Limpar todas as ${entries.length} entradas desta sessão?`)) return;
+  entries = [];
+  renderList();
+  updateCounter();
+  document.getElementById('summaryBar').classList.remove('show');
+  document.getElementById('btnFinish').disabled = true;
+  focusInput();
+}
+
+function finishSession() {
+  const ok  = entries.filter(e => e.status === 'ok').length;
+  const err = entries.filter(e => e.status === 'error').length;
+  const msg = `Sessão finalizada!\n✓ ${ok} entrada${ok !== 1 ? 's' : ''} registrada${ok !== 1 ? 's' : ''} com sucesso${err > 0 ? `\n✗ ${err} com erro` : ''}`;
+  alert(msg);
+  entries = [];
+  renderList();
+  updateCounter();
+  document.getElementById('summaryBar').classList.remove('show');
+  document.getElementById('btnFinish').disabled = true;
+  showSetup();
+}
+
+// ─── TOAST ────────────────────────────────────────────────
+function toast(msg, type = 'success') {
+  const wrap = document.getElementById('toastWrap');
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  el.textContent = msg;
+  wrap.appendChild(el);
+  setTimeout(() => el.remove(), 3100);
+}
+</script>
+</body>
+</html>
