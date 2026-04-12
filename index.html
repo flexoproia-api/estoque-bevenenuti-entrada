@@ -683,41 +683,27 @@ async function glideAddRow(tableId, columnValues) {
 }
 
 // ─── SETUP ────────────────────────────────────────────────
-async function showSetup() {
+function showSetup() {
   document.getElementById('setupScreen').style.display = 'block';
   document.getElementById('scanScreen').style.display  = 'none';
 
   const sel = document.getElementById('localSelect');
-  sel.innerHTML = '<option value="">Carregando...</option>';
 
-  try {
-    // Se TABLE_LOCAL estiver vazio, usa lista fixa de localizações como fallback
-    let locs = [];
-    if (TABLE_LOCAL) {
-      const rows = await glideQuery(TABLE_LOCAL);
-      locs = rows.map(r => r["Localização"] || r[Object.keys(r)[0]]).filter(Boolean).sort();
-    } else {
-      // Fallback: extrair localizações únicas da tabela de movimentos
-      const rows = await glideQuery(TABLE_MOV);
-      const set = new Set(rows.map(r => r[COL.localizacao]).filter(Boolean));
-      locs = [...set].sort();
-    }
+  const locs = [];
+  ['A','B','C'].forEach(letra => {
+    for (let i = 1; i <= 20; i++) locs.push(`${letra}${i}`);
+  });
 
-    sel.innerHTML = '<option value="">Selecione a localização...</option>';
-    locs.forEach(l => {
-      const o = document.createElement('option');
-      o.value = o.textContent = l;
-      sel.appendChild(o);
-    });
+  sel.innerHTML = '<option value="">Selecione a localização...</option>';
+  locs.forEach(l => {
+    const o = document.createElement('option');
+    o.value = o.textContent = l;
+    sel.appendChild(o);
+  });
 
-    sel.addEventListener('change', () => {
-      document.getElementById('btnStart').disabled = !sel.value;
-    });
-
-  } catch(e) {
-    sel.innerHTML = '<option value="">Erro ao carregar — tente novamente</option>';
-    toast('Erro ao carregar localizações', 'error');
-  }
+  sel.onchange = () => {
+    document.getElementById('btnStart').disabled = !sel.value;
+  };
 }
 
 function startScanning() {
