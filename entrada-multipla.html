@@ -594,13 +594,33 @@
 
 <script>
 // ─── CONFIG ───────────────────────────────────────────────
-const GLIDE_TOKEN  = "COLE_SEU_TOKEN_AQUI";
+const GLIDE_TOKEN  = "import * as glide from "@glideapps/tables";
+
+const movimentosTable = glide.table({
+    token: "7ed40182-c840-40e0-968b-db7313874e0f",
+    app: "FfbUFU97aWzsyCDvKZKV",
+    table: "native-table-6OvG8uWu6JdMCTX3tyg6",
+    columns: {
+        cDigoDeBarras: { type: "string", name: "aIlEP" },
+        data: { type: "date-time", name: "Q2fsH" },
+        usuRio1: { type: "string", name: "tqPkR" },
+        entradaQuantidade: { type: "number", name: "DfoDL" },
+        baixaQuantidade: { type: "number", name: "FnOPo" },
+        localizaO: { type: "string", name: "zeAYW" },
+        cDigoOrdemDeServiO: { type: "string", name: "48i7w" },
+        usuRio1: { type: "string", name: "kpNJV" }
+    }
+});
+
+// getRows requires Business plan or above
+const movimentos = await movimentosTable.get();
+";
 const GLIDE_APP    = "FfbUFU97aWzsyCDvKZKV";
 const TABLE_MOV    = "native-table-6OvG8uWu6JdMCTX3tyg6";
-const TABLE_LOCAL  = ""; // cole o ID da tabela de Localizações
-const TABLE_MAT    = ""; // cole o ID da tabela de Materiais
+const TABLE_LOCAL  = "native-table-Ca86akXGil4Anql71eGc"; 
+const TABLE_MAT    = "native-table-1L4wPB53vJM273qy7HAu"; 
+ 
 
-// IDs das colunas de Movimentos
 const COL = {
   codigoBarras:    "aIlEP",
   data:            "Q2fsH",
@@ -610,7 +630,7 @@ const COL = {
   chaveMatLocal:   "" // cole o column ID de Chave_MatLocal se tiver
 };
 
-const SENHA = "Alfagraf1234";
+const SENHA = "Benevenuti1234";
 
 // ─── STATE ────────────────────────────────────────────────
 let currentUser = null;
