@@ -632,6 +632,15 @@ const COL = {
 
 const SENHA = "Benevenuti1234";
 
+ document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('loginPass').addEventListener('keydown', e => {
+    if (e.key === 'Enter') doLogin();
+  });
+  document.getElementById('loginUser').addEventListener('keydown', e => {
+    if (e.key === 'Enter') doLogin();
+  });
+});
+
 // ─── STATE ────────────────────────────────────────────────
 let currentUser = null;
 let selectedLoc = null;
