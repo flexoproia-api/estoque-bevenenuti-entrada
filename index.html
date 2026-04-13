@@ -597,17 +597,21 @@
 const GLIDE_TOKEN  = "7ed40182-c840-40e0-968b-db7313874e0f";
 const GLIDE_APP    = "FfbUFU97aWzsyCDvKZKV";
 const TABLE_MOV    = "native-table-6OvG8uWu6JdMCTX3tyg6";
-const TABLE_LOCAL  = ""; // cole o ID da tabela de Localizações
-const TABLE_MAT    = ""; // cole o ID da tabela de Materiais
 
 // IDs das colunas de Movimentos
 const COL = {
-  codigoBarras:    "aIlEP",
-  data:            "Q2fsH",
-  usuario:         "tqPkR",
-  entradaQtd:      "DfoDL",
-  localizacao:     "zeAYW",
-  chaveMatLocal:   "" // cole o column ID de Chave_MatLocal se tiver
+  codigoBarras: "aIlEP",
+  data:         "Q2fsH",
+  usuario:      "tqPkR",
+  entradaQtd:   "DfoDL",
+  localizacao:  "zeAYW",
+};
+
+// Tabela e colunas do Estoque Local
+const TABLE_ESTOQUE_LOCAL = "native-table-Wd05MEpwje13w0ImxcEM";
+const COL_EL = {
+  codigoBarras: "Name",
+  localizacao:  "0A0vW",
 };
 
 const SENHA = "Benevenuti1234";
@@ -759,23 +763,35 @@ async function processBarcode(code) {
   updateCounter();
 
   try {
-    const ok = await glideAddRow(TABLE_MOV, {
+    // 1. Grava em Movimentos
+    const okMov = await glideAddRow(TABLE_MOV, {
       [COL.codigoBarras]: code,
       [COL.localizacao]:  selectedLoc,
       [COL.entradaQtd]:   1,
       [COL.usuario]:      currentUser,
       [COL.data]:         new Date().toISOString(),
-      ...(COL.chaveMatLocal ? { [COL.chaveMatLocal]: `${code}|${selectedLoc}` } : {})
     });
 
-    entry.status = ok ? 'ok' : 'error';
-    entry.desc   = ok ? selectedLoc : 'Erro ao salvar';
+    if (!okMov) throw new Error('Falha ao gravar em Movimentos');
 
-    if (ok) {
-      toast(`✓ ${code} registrado`, 'success');
-    } else {
-      toast(`Erro ao salvar ${code}`, 'error');
+    // 2. Verifica se já existe linha no Estoque Local para este código+localização
+    const rows = await glideQuery(TABLE_ESTOQUE_LOCAL);
+    const chave = `${code}|${selectedLoc}`;
+    const jaExiste = rows.some(r =>
+      r[COL_EL.codigoBarras] === code && r[COL_EL.localizacao] === selectedLoc
+    );
+
+    // 3. Se não existe, cria a linha no Estoque Local
+    if (!jaExiste) {
+      await glideAddRow(TABLE_ESTOQUE_LOCAL, {
+        [COL_EL.codigoBarras]: code,
+        [COL_EL.localizacao]:  selectedLoc,
+      });
     }
+
+    entry.status = 'ok';
+    entry.desc   = selectedLoc;
+    toast(`✓ ${code} registrado`, 'success');
 
   } catch(e) {
     entry.status = 'error';
