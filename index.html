@@ -762,11 +762,13 @@ document.addEventListener('DOMContentLoaded', () => {
 async function processQueue() {
   if (processing || queue.length === 0) return;
   processing = true;
+  document.getElementById('btnFinish').disabled = true;
   while (queue.length > 0) {
     const code = queue.shift();
     await processBarcode(code);
   }
   processing = false;
+  document.getElementById('btnFinish').disabled = entries.length === 0;
 }
 
 async function processBarcode(code) {
