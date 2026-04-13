@@ -620,6 +620,8 @@ const SENHA = "Benevenuti1234";
 let currentUser = null;
 let selectedLoc = null;
 let entries     = []; // { code, desc, status: 'loading'|'ok'|'error' }
+let processing  = false;
+let queue       = [];
 
 // ─── AUTH ─────────────────────────────────────────────────
 function doLogin() {
@@ -744,7 +746,8 @@ document.addEventListener('DOMContentLoaded', () => {
       const code = inp.value.trim();
       inp.value = '';
       if (!code) return;
-      await processBarcode(code);
+      queue.push(code);
+      processQueue();
     }
   });
 
@@ -755,6 +758,16 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 });
+
+async function processQueue() {
+  if (processing || queue.length === 0) return;
+  processing = true;
+  while (queue.length > 0) {
+    const code = queue.shift();
+    await processBarcode(code);
+  }
+  processing = false;
+}
 
 async function processBarcode(code) {
   const entry = { code, desc: '...', status: 'loading' };
